@@ -2,8 +2,10 @@ package edu.eci.cvds.tdd.library;
 
 import edu.eci.cvds.tdd.library.book.Book;
 import edu.eci.cvds.tdd.library.loan.Loan;
+import edu.eci.cvds.tdd.library.loan.LoanStatus;
 import edu.eci.cvds.tdd.library.user.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +37,17 @@ public class Library {
      * @return true if the book was stored false otherwise.
      */
     public boolean addBook(Book book) {
-        //TODO Implement the logic to add a new book into the map.
-        return false;
+        if (book == null) return false;
+
+        int cantidad = books.getOrDefault(book, 0);
+        books.put(book, cantidad + 1);
+
+        System.out.println("Libro agregado: " + book.getIsbn() + " - Nueva cantidad: " + books.get(book));
+
+        return true;
     }
+
+
 
     /**
      * This method creates a new loan with for the User identify by the userId and the book identify by the isbn,
@@ -53,9 +63,61 @@ public class Library {
      * @return The new created loan.
      */
     public Loan loanABook(String userId, String isbn) {
-        //TODO Implement the login of loan a book to a user based on the UserId and the isbn.
-        return null;
+        // Buscar el usuario
+        User user = users.stream()
+                .filter(u -> u.getId().equals(userId))
+                .findFirst()
+                .orElse(null);
+
+        if (user == null) {
+            System.out.println("Error: El usuario no existe.");
+            return null;
+        }
+
+        // Buscar el libro en el Map usando ISBN
+        Book book = books.keySet().stream()
+                .filter(b -> b.getIsbn().equals(isbn))
+                .findFirst()
+                .orElse(null);
+
+        if (book == null) {
+            System.out.println("Error: El libro con ISBN " + isbn + " no existe.");
+            return null;
+        }
+
+        Integer availableCopies = books.get(book);
+        if (availableCopies == null || availableCopies == 0) {
+            System.out.println("Error: No hay copias disponibles del libro.");
+            return null;
+        }
+
+        // Verificar si el usuario ya tiene un préstamo activo de este libro
+        boolean hasActiveLoan = loans.stream()
+                .anyMatch(loan -> loan.getUser().equals(user) &&
+                        loan.getBook().equals(book) &&
+                        loan.getStatus() == LoanStatus.ACTIVE);
+
+        if (hasActiveLoan) {
+            System.out.println("Error: El usuario ya tiene un préstamo activo de este libro.");
+            return null;
+        }
+
+        // Crear y registrar el préstamo
+        Loan loan = new Loan();
+        loan.setBook(book);
+        loan.setUser(user);
+        loan.setLoanDate(LocalDateTime.now());
+        loan.setStatus(LoanStatus.ACTIVE);
+
+        loans.add(loan);
+        books.put(book, availableCopies - 1); // Reducir copias disponibles
+
+        System.out.println("Préstamo realizado con éxito.");
+        return loan;
     }
+
+
+
 
     /**
      * This method return a loan, meaning that the amount of books should be increased by 1, the status of the Loan
@@ -67,9 +129,40 @@ public class Library {
      * @return the loan with the RETURNED status.
      */
     public Loan returnLoan(Loan loan) {
-        //TODO Implement the login of loan a book to a user based on the UserId and the isbn.
-        return null;
+        if (loan == null) {
+            System.out.println("Error: El préstamo recibido es null.");
+            return null;
+        }
+
+        System.out.println("Intentando devolver el préstamo: " + loan);
+
+        Loan existingLoan = loans.stream()
+                .filter(l -> l.getBook().equals(loan.getBook()) && l.getUser().equals(loan.getUser()) && l.getStatus() == LoanStatus.ACTIVE)
+                .findFirst()
+                .orElse(null);
+
+        if (existingLoan == null) {
+            System.out.println("Error: No se encontró un préstamo activo para este libro y usuario.");
+            return null;
+        }
+
+        existingLoan.setStatus(LoanStatus.RETURNED);
+        existingLoan.setReturnDate(LocalDateTime.now());
+        books.put(existingLoan.getBook(), books.get(existingLoan.getBook()) + 1);
+
+        System.out.println("Préstamo devuelto correctamente.");
+
+        return existingLoan;
     }
+
+
+    public Map<Book, Integer> getBooks() {
+        return books;
+    }
+
+
+
+
 
     public boolean addUser(User user) {
         return users.add(user);
