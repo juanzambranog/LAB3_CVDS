@@ -53,6 +53,16 @@ Y comprobamos que la estructura esta bien usando ```mvn clean package```
 
 ## PRUEBAS UNITARIAS Y TDD
 
+Implementamos el metodo TDD, por lo que para cada metodo realizamos las pruebas necesarias antes de completar el metodo en base a la documentacion proporcionada.
+
+### TEST
+
+![alt text](resources/image-22.png)
+
+![alt text](resources/image-23.png)
+
+![alt text](resources/image-24.png)
+
 
 ### COBERTURA
 
@@ -63,6 +73,35 @@ Agregamos la dependencia de Jacoco
 Abrimos el archivo index.html para ver la cobertura inicial del proyecto. 
 
 ![alt text](resources/image-18.png)
+
+Ahora limpiamos los datos de las compilaciones anteriores con ``` mvn clean```
+
+![alt text](resources/image-25.png)
+
+Una vez limpiemos el proyecto ejecutamos las pruebas de nuevo con ```mvn test```
+
+![alt text](resources/image-26.png)
+
+![alt text](resources/image-27.png)
+
+Una vez las pruebas hallan corrido generamos el reporte de jacoco con ```mvn jacoco:report```
+
+![alt text](resources/image-28.png)
+
+
+Ahora buscamos el reporte que se encuentra en ```target\site\jacoco``` y es un archivo ```index.html```
+
+
+![alt text](resources/image-29.png)
+
+Lo abrimos y miramos el repote de Jacoco actualizado 
+
+
+![alt text](resources/image-30.png)
+
+Como podemos ver en el reporte tenemos una covertura total de 83%
+
+
 
 ## SONARQUBE
 
@@ -87,11 +126,11 @@ Y generamos un token.
 
 ![alt text](resources/image-13.png)
 
-![alt text](resources/image-14.png)
+![alt text](resources/image-31.png)
 
 Nuestro token es:
 
-```sqa_d8ca3e33f8faa5f0735ab0edd254f93435105bb9```
+```squ_dc047689f4b24e5fae28bd175e533dce8cf5799d```
 
 Instalamos SonarQube/SonarLint en nuestro IDE en este caso en ```Visual Studio Code```
 
@@ -105,3 +144,12 @@ Y añadimos las propiedades de SonarQube y Jacoco.
 
 ![alt text](resources/image-20.png)
 
+Una vez completemos lo anterior generamos la integración con sonar ```mvn verify sonar:sonar -D sonar.token=squ_dc047689f4b24e5fae28bd175e533dce8cf5799d```
+
+![alt text](resources/image-32.png)
+
+![alt text](resources/image-33.png)
+
+Ahora resta verificar en SonarQube 
+
+![alt text](resources/image-34.png)

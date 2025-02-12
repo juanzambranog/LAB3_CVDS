@@ -161,7 +161,9 @@ public class Library {
     }
 
 
-
+    public List<User> getUsers() {
+        return users;
+    }
 
 
     public boolean addUser(User user) {
